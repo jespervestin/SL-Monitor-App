@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, RefreshCw, CheckCircle, AlertTriangle, XCircle, Clock, Train } from 'lucide-react';
-import { generateTransitSummary } from '../utils/gemini';
+import { RefreshCw, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 
 // Analyze transit data and return structured info
 function analyzeTransitData({ departures, deviations, station }) {
@@ -77,62 +76,23 @@ function generateLocalSummary({ departures, deviations, station }) {
 
 export function AISummary({ departures, deviations, stopDeviations = [], station, destinationStation, isDataLoading }) {
   const [summary, setSummary] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isAI, setIsAI] = useState(false);
   const [lastGenerated, setLastGenerated] = useState(null);
 
-  const generateSummary = async (forceRefresh = false) => {
+  const generateSummary = () => {
     if (isDataLoading) return;
-    setLoading(true);
-    
-    try {
-      const result = await generateTransitSummary({ departures, deviations, stopDeviations, station, destinationStation, forceRefresh });
-      if (result && result.trim()) {
-        // If we got a result from the API, trust it as AI-generated
-        // The API will throw an error if it fails, so if we get here, it's from AI
-        console.log('✅ AISummary component - Setting summary:');
-        console.log('Length:', result.length, 'characters');
-        console.log('Full text being set:', result);
-        console.log('---');
-        setSummary(result);
-        setIsAI(true);
-        setLastGenerated(new Date());
-      } else {
-        console.log('⚠️ AI returned empty, using local fallback');
-        const localSummary = generateLocalSummary({ departures, deviations, station });
-        setSummary(localSummary);
-        setIsAI(false);
-        setLastGenerated(new Date());
-      }
-    } catch (err) {
-      console.error('❌ AI summary generation failed:', err.message || err);
-      const localSummary = generateLocalSummary({ departures, deviations, station });
-      setSummary(localSummary);
-      setIsAI(false);
-      setLastGenerated(new Date());
-    } finally {
-      setLoading(false);
-    }
+    const localSummary = generateLocalSummary({ departures, deviations, station });
+    setSummary(localSummary);
+    setLastGenerated(new Date());
   };
 
   useEffect(() => {
     if (!isDataLoading && (departures.length > 0 || deviations.length > 0)) {
-      const timer = setTimeout(() => generateSummary(), 500);
+      const timer = setTimeout(generateSummary, 500);
       return () => clearTimeout(timer);
     }
-  }, [station?.id, destinationStation?.id, isDataLoading]);
+  }, [station?.id, destinationStation?.id, isDataLoading, departures.length, deviations.length]);
 
-  // Debug: Log when summary state changes
-  useEffect(() => {
-    if (summary) {
-      console.log('📝 Summary state updated:');
-      console.log('Length:', summary.length, 'characters');
-      console.log('Full text in state:', summary);
-      console.log('---');
-    }
-  }, [summary]);
-
-  if (!station && deviations.length === 0 && !loading) {
+  if (!station && deviations.length === 0) {
     return null;
   }
 
@@ -156,38 +116,25 @@ export function AISummary({ departures, deviations, stopDeviations = [], station
             <StatusIcon className={`w-4 h-4 ${config.color}`} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-[14px] text-[var(--text-primary)]">Quick Summary</p>
-              {isAI && (
-                <span className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[10px] text-[var(--text-tertiary)] flex items-center gap-1">
-                  <Sparkles className="w-2.5 h-2.5" />
-                  AI
-                </span>
-              )}
-            </div>
+            <p className="font-semibold text-[14px] text-[var(--text-primary)]">Quick Summary</p>
             <p className="text-[11px] text-[var(--text-tertiary)]">{station?.name || 'All lines'}</p>
           </div>
         </div>
         
         <button
-          onClick={() => generateSummary(true)}
-          disabled={loading}
+          onClick={generateSummary}
+          disabled={isDataLoading}
           className="p-2 rounded-lg hover:bg-[var(--bg-elevated)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] 
                      transition-colors disabled:opacity-50"
           title="Refresh summary"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* Summary */}
       <div className="px-5 py-3">
-        {loading ? (
-          <div className="flex items-center gap-2">
-            <RefreshCw className="w-3.5 h-3.5 text-[var(--text-tertiary)] animate-spin" />
-            <p className="text-[15px] text-[var(--text-tertiary)]">Generating content...</p>
-          </div>
-        ) : summary ? (
+        {summary ? (
           <div className="w-full overflow-visible">
             <p className="text-[15px] text-[var(--text-secondary)] leading-relaxed break-words whitespace-normal overflow-visible max-w-none" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{summary}</p>
             {lastGenerated && (
