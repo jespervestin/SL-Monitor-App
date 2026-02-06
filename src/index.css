@@ -32,6 +32,7 @@
   --sl-metro-blue: #0066b3;
   --sl-train-pink: #e5007d;
   --sl-tram-purple: #bf5af2;
+  --sl-bus-blue: #0066b3;
   
   /* Spacing scale */
   --space-xs: 4px;
@@ -181,6 +182,7 @@ body {
 .line-metro-blue { background-color: var(--sl-metro-blue); }
 .line-train { background-color: var(--sl-train-pink); }
 .line-tram { background-color: var(--sl-tram-purple); }
+.line-bus { background-color: var(--sl-bus-blue); }
 
 /* Status indicators */
 .status-ok { color: var(--color-green); }

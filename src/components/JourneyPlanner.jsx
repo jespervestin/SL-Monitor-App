@@ -10,15 +10,133 @@ function TripLeg({ leg, isFirst }) {
   }
   
   const productClass = transport?.product?.class || 0;
+  const transportName = transport?.name || '';
+  const productName = transport?.product?.name || '';
   
-  // Map product class to transport mode for color
-  let transportMode = 'TRAIN';
-  if (productClass === 2) transportMode = 'METRO';
-  else if (productClass === 5) transportMode = 'BUS';
-  else if (productClass === 4) transportMode = 'TRAM';
+  // Detect transport mode - check product class first, then name for keywords
+  let transportMode = 'TRAIN'; // Default
+  const nameLower = (transportName + ' ' + productName).toLowerCase();
+  
+  if (productClass === 2 || nameLower.includes('tunnelbana') || nameLower.includes('metro')) {
+    transportMode = 'METRO';
+  } else if (productClass === 5 || productClass === 4 || nameLower.includes('buss') || nameLower.includes('bus')) {
+    transportMode = 'BUS';
+  } else if (productClass === 3 || nameLower.includes('spårvagn') || nameLower.includes('tram')) {
+    transportMode = 'TRAM';
+  } else if (productClass === 1 || nameLower.includes('pendeltåg') || nameLower.includes('train')) {
+    transportMode = 'TRAIN';
+  }
+  
+  // Extract line number - comprehensive check of all possible fields
+  // Check in order of reliability: direct fields > nested fields > parsed from name
+  
+  // 1. Check direct transport fields first (most reliable)
+  let lineNumber = transport?.disassembledName || 
+                   transport?.number || 
+                   transport?.line || 
+                   transport?.designation;
+  
+  // 2. Check product-level fields
+  if (!lineNumber) {
+    lineNumber = transport?.product?.number ||
+                 transport?.product?.line ||
+                 transport?.product?.designation;
+  }
+  
+  // 3. Check leg-level fields (sometimes line info is at leg level)
+  if (!lineNumber) {
+    lineNumber = leg?.line ||
+                 leg?.designation ||
+                 leg?.transportation?.disassembledName || 
+                 leg?.transportation?.number ||
+                 leg?.transportation?.line;
+  }
+  
+  // 4. Parse from transport name - try multiple strategies
+  if (!lineNumber && transportName) {
+    // Strategy A: Match numbers after transport keywords (e.g., "Tunnelbana 17", "Buss 4")
+    const keywordPatterns = [
+      /(?:tunnelbana|metro|buss|bus|spårvagn|tram|pendeltåg|train|line|linje)\s+(\d+)/i,
+      /(\d+)\s*(?:tunnelbana|metro|buss|bus|spårvagn|tram|pendeltåg|train|line|linje)/i,
+      /(?:^|\s)(\d{1,3})(?:\s|$)/, // Standalone 1-3 digit number
+    ];
+    
+    for (const pattern of keywordPatterns) {
+      const match = transportName.match(pattern);
+      if (match && match[1]) {
+        lineNumber = match[1];
+        break;
+      }
+    }
+    
+    // Strategy B: Split and check parts (common pattern: "Tunnelbana 17" -> ["Tunnelbana", "17"])
+    if (!lineNumber) {
+      const parts = transportName.trim().split(/[\s\-]+/);
+      // Check last part first (most common: "Tunnelbana 17")
+      const lastPart = parts[parts.length - 1];
+      if (/^\d+$/.test(lastPart)) {
+        lineNumber = lastPart;
+      } else if (parts.length > 1) {
+        // Check second-to-last (e.g., "Line 17 Express")
+        const secondLast = parts[parts.length - 2];
+        if (/^\d+$/.test(secondLast)) {
+          lineNumber = secondLast;
+        }
+      }
+    }
+    
+    // Strategy C: Find any number in the name (last resort for name parsing)
+    if (!lineNumber) {
+      const numbers = transportName.match(/\d+/g);
+      if (numbers && numbers.length > 0) {
+        // Prefer shorter numbers (line numbers are usually 1-3 digits, not years/dates)
+        const shortNumbers = numbers.filter(n => n.length <= 3);
+        lineNumber = shortNumbers.length > 0 ? shortNumbers[0] : numbers[0];
+      }
+    }
+  }
+  
+  // 5. Check product name
+  if (!lineNumber && productName) {
+    const productNumbers = productName.match(/\d+/g);
+    if (productNumbers && productNumbers.length > 0) {
+      const shortNumbers = productNumbers.filter(n => n.length <= 3);
+      lineNumber = shortNumbers.length > 0 ? shortNumbers[0] : productNumbers[0];
+    }
+  }
+  
+  // 6. Check all nested objects recursively (deep search)
+  if (!lineNumber) {
+    const deepSearch = (obj, depth = 0) => {
+      if (depth > 3 || !obj || typeof obj !== 'object') return null;
+      
+      // Check common field names
+      const fields = ['number', 'line', 'designation', 'disassembledName', 'id'];
+      for (const field of fields) {
+        if (obj[field] && typeof obj[field] === 'string' && /^\d+$/.test(obj[field])) {
+          return obj[field];
+        }
+      }
+      
+      // Recursively search nested objects
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
+          const result = deepSearch(obj[key], depth + 1);
+          if (result) return result;
+        }
+      }
+      return null;
+    };
+    
+    lineNumber = deepSearch(transport) || deepSearch(leg);
+  }
+  
+  // Final fallback - only show "?" if absolutely nothing found
+  if (!lineNumber) {
+    lineNumber = '?';
+  }
   
   const lineColor = getLineColorClass(transportMode, transport?.name);
-  const lineNumber = transport?.disassembledName || transport?.number || transport?.name?.split(' ').pop() || '?';
   
   const departureTime = leg.origin?.departureTimeEstimated || leg.origin?.departureTimePlanned;
   const arrivalTime = leg.destination?.arrivalTimeEstimated || leg.destination?.arrivalTimePlanned;

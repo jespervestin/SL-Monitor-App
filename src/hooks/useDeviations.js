@@ -32,13 +32,18 @@ export function useDeviations(station = null, transportModes = ['TRAIN', 'METRO'
       // Ensure data is an array
       const deviationsArray = Array.isArray(data) ? data : [];
       
-      // Filter out elevator-related alerts (Avstängd hiss)
+      // Filter out elevator-related alerts (hiss/hissar)
       const filteredDeviations = deviationsArray.filter(deviation => {
         const message = deviation.message_variants?.find(v => v.language === 'sv') 
           || deviation.message_variants?.[0] || {};
-        const header = message.header || '';
-        // Exclude alerts about elevators being out of service
-        return !header.toLowerCase().includes('avstängd hiss');
+        const header = (message.header || '').toLowerCase();
+        const messageText = (message.message || '').toLowerCase();
+        const title = (deviation.title || '').toLowerCase();
+        const description = (deviation.description || '').toLowerCase();
+        
+        // Check all text fields for elevator mentions
+        const allText = `${header} ${messageText} ${title} ${description}`;
+        return !allText.includes('hiss') && !allText.includes('hissar');
       });
       
       // Sort by priority (importance_level, lower is more important)

@@ -9,7 +9,6 @@ import { DepartureBoard } from './components/DepartureBoard';
 import { DeviationsList } from './components/DeviationsList';
 import { AISummary } from './components/AISummary';
 import { JourneyPlanner } from './components/JourneyPlanner';
-import { Train } from 'lucide-react';
 
 function App() {
   const { stations, selectedStation, selectStation, favorites, toggleFavorite, isFavorite, loading: stationsLoading } = useStations();
@@ -109,17 +108,6 @@ function App() {
           </div>
         ) : (
           <div className="flex-1 flex flex-col min-h-0 space-y-4 md:space-y-5">
-            {/* Welcome state - compact */}
-            <div className="card p-5 flex items-center gap-4 shrink-0">
-              <div className="w-12 h-12 rounded-xl bg-[#2870f0] flex items-center justify-center shrink-0">
-                <Train className="w-6 h-6 text-white" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-semibold text-[15px] text-[var(--text-primary)]">Välj en station</p>
-                <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">Se avgångar och störningar i realtid</p>
-              </div>
-            </div>
-            
             {/* Show alerts even without station selected */}
             {deviations.length > 0 && (
               <div className="flex-1 min-h-0">
