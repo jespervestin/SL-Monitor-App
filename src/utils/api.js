@@ -200,7 +200,6 @@ export async function searchStops(query) {
     
     return [];
   } catch (error) {
-    console.error('Error searching stops:', error);
     throw new Error(`Failed to search stops: ${error.message}`);
   }
 }
@@ -221,7 +220,6 @@ export async function getJourneyPlannerLocationId(stationName) {
     }
     return null;
   } catch (error) {
-    console.error('Error getting journey planner location ID:', error);
     return null;
   }
 }
@@ -272,7 +270,6 @@ export async function searchTrips({ originId, destinationId, numTrips = 3, depar
       systemMessages: data.systemMessages || []
     };
   } catch (error) {
-    console.error('Error searching trips:', error);
     throw new Error(`Failed to search trips: ${error.message}`);
   }
 }

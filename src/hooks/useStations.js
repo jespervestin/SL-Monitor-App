@@ -39,7 +39,7 @@ export function useStations() {
               .filter(Boolean);
             setFavorites(favoriteStations);
           } catch (e) {
-            console.error('Failed to parse favorites:', e);
+            // Failed to parse favorites, ignore
           }
         }
         
@@ -53,7 +53,6 @@ export function useStations() {
         }
       } catch (err) {
         setError(err.message);
-        console.error('Failed to load stations:', err);
       } finally {
         setLoading(false);
       }

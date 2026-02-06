@@ -71,7 +71,6 @@ export function StationSearch({
         const results = await searchStops(destinationQuery);
         setDestinationResults(results);
       } catch (error) {
-        console.error('Error searching destination:', error);
         setDestinationResults([]);
       } finally {
         setIsLoadingDestination(false);

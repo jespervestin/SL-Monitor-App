@@ -53,7 +53,6 @@ export function useDeviations(station = null, transportModes = ['TRAIN', 'METRO'
       setError(null); // Clear any previous errors
     } catch (err) {
       setError(err.message);
-      console.error('Failed to load deviations:', err);
       setDeviations([]); // Set empty array on error
     }
   }, [transportModes.join(',')]);

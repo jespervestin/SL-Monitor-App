@@ -43,7 +43,6 @@ export function useDepartures(station, transportModes = ['TRAIN', 'METRO', 'TRAM
       setLastUpdated(new Date());
     } catch (err) {
       setError(err.message);
-      console.error('Failed to load departures:', err);
     }
   }, [station?.id, transportModes.join(',')]);
 

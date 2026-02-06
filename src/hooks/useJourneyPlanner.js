@@ -33,7 +33,6 @@ export function useJourneyPlanner(originStation, destinationStation) {
         setOriginId(originIdValue);
         setDestinationId(destinationIdValue);
       } catch (err) {
-        console.error('Error fetching journey planner IDs:', err);
         setOriginId(null);
         setDestinationId(null);
       }
@@ -62,7 +61,6 @@ export function useJourneyPlanner(originStation, destinationStation) {
       setTrips(result.journeys || []);
       setLastUpdated(new Date());
     } catch (err) {
-      console.error('Error fetching trips:', err);
       setError(err.message);
       setTrips([]);
     } finally {
