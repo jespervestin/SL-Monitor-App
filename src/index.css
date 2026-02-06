@@ -1,0 +1,285 @@
+@import "tailwindcss";
+
+/* Light mode - default */
+:root,
+[data-theme="light"] {
+  /* Light mode: give cards contrast against app background */
+  --bg-primary: #f5f6f8;   /* page background */
+  --bg-secondary: #eef0f3; /* secondary surfaces */
+  --bg-card: #ffffff;      /* cards */
+  --bg-card-hover: #fafbfc;
+  --bg-elevated: #f1f3f5;  /* inputs/buttons on cards */
+  
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.12);
+  
+  --text-primary: #000000;
+  --text-secondary: rgba(0, 0, 0, 0.65);
+  --text-tertiary: rgba(0, 0, 0, 0.4);
+  --text-muted: rgba(0, 0, 0, 0.25);
+  
+  /* Status colors */
+  --color-red: #ff453a;
+  --color-orange: #ff9f0a;
+  --color-green: #30d158;
+  --color-blue: #0a84ff;
+  --color-purple: #bf5af2;
+  
+  /* SL Line Colors */
+  --sl-metro-green: #1b9b46;
+  --sl-metro-red: #e4022d;
+  --sl-metro-blue: #0066b3;
+  --sl-train-pink: #e5007d;
+  --sl-tram-purple: #bf5af2;
+  
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-card: #161618;
+  --bg-card-hover: #1c1c1e;
+  --bg-elevated: #1c1c1e;
+  
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.12);
+  
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-muted: rgba(255, 255, 255, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+  line-height: 1.4;
+}
+
+/* Responsive container - dynamic width, uses more space on large screens */
+.container-dynamic {
+  width: 100%;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+@media (min-width: 640px) {
+  .container-dynamic {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-dynamic {
+    padding-left: clamp(24px, 3vw, 48px);
+    padding-right: clamp(24px, 3vw, 48px);
+  }
+}
+
+@media (min-width: 1440px) {
+  .container-dynamic {
+    padding-left: clamp(32px, 4vw, 64px);
+    padding-right: clamp(32px, 4vw, 64px);
+  }
+}
+
+@media (min-width: 1920px) {
+  .container-dynamic {
+    padding-left: clamp(48px, 5vw, 96px);
+    padding-right: clamp(48px, 5vw, 96px);
+  }
+}
+
+/* Card styles */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.card-interactive {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.card-interactive:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-default);
+}
+
+/* Dynamic grid system */
+.grid-dynamic {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .grid-dynamic {
+    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-dynamic {
+    gap: 20px;
+  }
+}
+
+/* Auto-fit grid for flexible content */
+.grid-auto {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (min-width: 768px) {
+  .grid-auto {
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+/* Line colors */
+.line-metro-green { background-color: var(--sl-metro-green); }
+.line-metro-red { background-color: var(--sl-metro-red); }
+.line-metro-blue { background-color: var(--sl-metro-blue); }
+.line-train { background-color: var(--sl-train-pink); }
+.line-tram { background-color: var(--sl-tram-purple); }
+
+/* Status indicators */
+.status-ok { color: var(--color-green); }
+.status-warning { color: var(--color-orange); }
+.status-error { color: var(--color-red); }
+
+/* Scrollbar - minimal */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Transitions - no theme transitions, keep hover/interaction transitions */
+button, a, input, [role="button"] {
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+/* Disable transitions for theme-related properties on root to prevent theme change animations */
+html, body {
+  transition: background-color 0s, color 0s;
+}
+
+button:active, [role="button"]:active {
+  transform: scale(0.98);
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive text */
+.text-responsive-sm {
+  font-size: clamp(11px, 2.5vw, 12px);
+}
+
+.text-responsive-base {
+  font-size: clamp(13px, 3vw, 14px);
+}
+
+.text-responsive-lg {
+  font-size: clamp(15px, 3.5vw, 17px);
+}
+
+.text-responsive-xl {
+  font-size: clamp(18px, 4vw, 22px);
+}
+
+/* Safe area padding for mobile */
+.safe-bottom {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* Backdrop blur support */
+@supports (backdrop-filter: blur(20px)) {
+  .backdrop-blur-supported {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* Animate in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeIn 0.2s ease-out;
+}
